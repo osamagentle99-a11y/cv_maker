@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ data.name }} | CV</title>
+
+    <style>
+        body {
+            margin: 0;
+            background: #e5e7eb;
+            font-family: Arial, sans-serif;
+            color: #1e293b;
+        }
+
+        .cv {
+            max-width: 850px;
+            margin: 40px auto;
+            background: white;
+            padding: 50px;
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            border-bottom: 3px solid #2563eb;
+            padding-bottom: 20px;
+            margin-bottom: 25px;
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 36px;
+            color: #1e293b;
+        }
+
+        .header h3 {
+            color: #2563eb;
+            margin: 8px 0;
+        }
+
+        .contact {
+            color: #64748b;
+            font-size: 14px;
+        }
+
+        .section {
+            margin-bottom: 25px;
+        }
+
+        .section h2 {
+            font-size: 18px;
+            color: #2563eb;
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 8px;
+        }
+
+        .section p {
+            white-space: pre-line;
+            line-height: 1.7;
+            color: #475569;
+        }
+
+        .download {
+    display: block;
+    width: 850px;
+    max-width: 90%;
+    margin: 20px auto;
+    padding: 14px;
+    background: #2563eb;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+.download:hover {
+    background: #1d4ed8;
+}
+
+        @media print {
+            body {
+                background: white;
+            }
+
+            .cv {
+                margin: 0;
+                box-shadow: none;
+            }
+
+            .download {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="cv">
+
+        <div class="header">
+            <h1>{{ data.name }}</h1>
+            <h3>{{ data.job_title }}</h3>
+            <div class="contact">
+                {{ data.email }} | {{ data.phone }}
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Professional Summary</h2>
+            <p>{{ data.summary }}</p>
+        </div>
+
+        <div class="section">
+            <h2>Experience</h2>
+            <p>{{ data.experience }}</p>
+        </div>
+
+        <div class="section">
+            <h2>Education</h2>
+            <p>{{ data.education }}</p>
+        </div>
+
+        <div class="section">
+            <h2>Skills</h2>
+            <p>{{ data.skills }}</p>
+        </div>
+
+    </div>
+
+    <button type="submit" class="download">
+        Download CV
+    </button>
+
+</body>
+</html>

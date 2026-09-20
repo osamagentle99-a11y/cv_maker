@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en" style="scroll-behavior: smooth;">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Bootstrap CSS -->
+    <link
+        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
+        rel="stylesheet"
+        integrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB"
+        crossorigin="anonymous"
+    >
+
+    <title>DESIGNATION.CV | Modern CV Maker</title>
+   
+<link
+    rel="icon"
+    type="image/png"
+    href="{{ url_for('static', filename='finallogo.png') }}"
+>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f7fb;
+            color: #1e293b;
+            overflow-x: hidden;
+        }
+
+        /* =========================
+           NAVBAR
+        ========================= */
+
+        .navbar {
+            background: #ffffff !important;
+            padding: 12px 3%;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+        }
+
+        .navbar-brand img {
+            width: 100px;
+            height: auto;
+            display: block;
+        }
+
+        .navbar-nav {
+            gap: 8px;
+        }
+
+        .navbar-nav .nav-link {
+            color: #1e293b;
+            font-weight: 500;
+            padding: 10px 15px;
+            border-radius: 6px;
+            transition: 0.3s ease;
+        }
+
+        .navbar-nav .nav-link:hover {
+            color: #2563eb;
+            background: #eff6ff;
+        }
+
+        .navbar-nav .nav-link.active {
+            color: #2563eb;
+            font-weight: 600;
+        }
+
+        .dropdown-menu {
+            border: none;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+            padding: 8px;
+        }
+
+        .dropdown-item {
+            border-radius: 6px;
+            padding: 9px 12px;
+        }
+
+        .dropdown-item:hover {
+            background: #eff6ff;
+            color: #2563eb;
+        }
+
+        /* =========================
+           HERO SECTION
+        ========================= */
+
+        .hero {
+            width: 100%;
+            min-height: 520px;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+
+            text-align: center;
+
+            padding: 80px 20px;
+        }
+
+        .hero h1 {
+            font-size: clamp(36px, 5vw, 58px);
+            line-height: 1.15;
+            font-weight: 700;
+            margin-bottom: 22px;
+            max-width: 900px;
+        }
+
+        .hero h1 span {
+            color: #2563eb;
+        }
+
+        .hero p {
+            width: 100%;
+            max-width: 650px;
+
+            font-size: clamp(16px, 2vw, 19px);
+            line-height: 1.7;
+
+            color: #64748b;
+
+            margin: 0 auto 35px;
+        }
+
+        .hero .btn {
+            display: inline-block;
+
+            padding: 14px 30px;
+
+            background: #2563eb;
+            color: white;
+
+            text-decoration: none;
+
+            border-radius: 8px;
+
+            font-size: 16px;
+            font-weight: bold;
+
+            transition: all 0.3s ease;
+        }
+
+        .hero .btn:hover {
+            background: #1d4ed8;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.25);
+        }
+
+        /* =========================
+           FEATURES
+        ========================= */
+
+        .features {
+            width: 100%;
+            max-width: 1200px;
+
+            margin: 0 auto;
+
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+
+            gap: 25px;
+
+            padding: 30px 30px 80px;
+        }
+
+        .card {
+            width: 100%;
+            min-height: 220px;
+
+            background: white;
+
+            padding: 30px 25px;
+
+            border: none;
+            border-radius: 12px;
+
+            text-align: center;
+
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+
+            transition: all 0.3s ease;
+        }
+
+        
+
+        .card-icon {
+            font-size: 35px;
+            margin-bottom: 10px;
+        }
+
+        .card h3 {
+            margin: 10px 0 12px;
+
+            font-size: 21px;
+            font-weight: 600;
+        }
+
+        .card p {
+            color: #64748b;
+            font-size: 14px;
+            line-height: 1.6;
+
+            margin: 0;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.09);
+        }
+
+        /* =========================
+           TABLET
+        ========================= */
+
+        @media (max-width: 991px) {
+
+            .navbar {
+                padding: 10px 20px;
+            }
+
+            .navbar-nav {
+                gap: 0;
+                padding-top: 10px;
+            }
+
+            .navbar-nav .nav-link {
+                padding: 10px 5px;
+            }
+
+            .hero {
+                min-height: 480px;
+                padding: 70px 25px;
+            }
+
+            .features {
+                grid-template-columns: repeat(2, 1fr);
+                padding-left: 25px;
+                padding-right: 25px;
+            }
+        }
+
+        /* =========================
+           MOBILE
+        ========================= */
+
+        @media (max-width: 767px) {
+
+            .navbar {
+                padding: 10px 15px;
+            }
+
+            .navbar-brand img {
+                width: 90px;
+            }
+
+            .navbar-collapse {
+                padding-top: 10px;
+            }
+
+            .navbar-nav .nav-link {
+                padding: 10px 8px;
+            }
+
+            .dropdown-menu {
+                box-shadow: none;
+                background: #f8fafc;
+            }
+
+            .hero {
+                min-height: auto;
+                padding: 75px 20px 60px;
+            }
+
+            .hero h1 {
+                font-size: 38px;
+                line-height: 1.2;
+                margin-bottom: 18px;
+            }
+
+            .hero h1 span {
+                display: block;
+                margin-top: 5px;
+            }
+
+            .hero p {
+                font-size: 16px;
+                line-height: 1.6;
+                max-width: 550px;
+                margin-bottom: 28px;
+            }
+
+            .hero .btn {
+                width: 100%;
+                max-width: 260px;
+                padding: 13px 20px;
+            }
+
+            .features {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                padding: 20px 20px 60px;
+            }
+
+            .card {
+                min-height: auto;
+                padding: 28px 22px;
+            }
+        }
+
+        /* =========================
+           SMALL MOBILE
+        ========================= */
+
+        @media (max-width: 480px) {
+
+            .navbar-brand img {
+                width: 85px;
+            }
+
+            .hero {
+                padding: 60px 16px 50px;
+            }
+
+            .hero h1 {
+                font-size: 32px;
+            }
+
+            .hero p {
+                font-size: 15px;
+                line-height: 1.6;
+            }
+
+            .hero .btn {
+                max-width: 240px;
+                font-size: 15px;
+                padding: 12px 18px;
+            }
+
+            .features {
+                padding: 15px 16px 50px;
+            }
+
+            .card {
+                padding: 25px 18px;
+            }
+
+            .card h3 {
+                font-size: 19px;
+            }
+
+            .card p {
+                font-size: 14px;
+            }
+        }
+
+        /* =========================
+           VERY SMALL DEVICES
+        ========================= */
+
+        @media (max-width: 360px) {
+
+            .hero h1 {
+                font-size: 28px;
+            }
+
+            .hero p {
+                font-size: 14px;
+            }
+
+            .hero .btn {
+                max-width: 220px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- =========================
+         NAVBAR
+    ========================= -->
+
+    <nav class="navbar navbar-expand-lg fixed-top">
+        <div class="container-fluid">
+
+            <!-- Logo -->
+            <a class="navbar-brand" href="/">
+                <img
+                    src="{{ url_for('static', filename='finallogo.png') }}"
+                    alt="CVCraft Logo"
+                >
+            </a>
+
+            <!-- Mobile Menu Button -->
+            <button
+                class="navbar-toggler"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#navbarNavDropdown"
+                aria-controls="navbarNavDropdown"
+                aria-expanded="false"
+                aria-label="Toggle navigation"
+            >
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Navigation -->
+            <div class="collapse navbar-collapse" id="navbarNavDropdown">
+
+                <ul class="navbar-nav ms-auto">
+
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/">
+                            Home
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="#features">
+                            Features
+                        </a>
+                    </li>
+
+                    <li class="nav-item">
+                        <a class="nav-link" href="/create">
+                            Create CV
+                        </a>
+                    </li>
+
+                    <!-- <li class="nav-item dropdown">
+
+                        <a
+                            class="nav-link dropdown-toggle"
+                            href="#"
+                            role="button"
+                            data-bs-toggle="dropdown"
+                            aria-expanded="false"
+                        >
+                            More
+                        </a>
+
+                        <ul class="dropdown-menu">
+
+                            <li>
+                                <a class="dropdown-item" href="#">
+                                    About
+                                </a>
+                            </li>
+
+                            <li>
+                                <a class="dropdown-item" href="#">
+                                    Templates
+                                </a>
+                            </li>
+
+                            <li>
+                                <a class="dropdown-item" href="#">
+                                    Contact
+                                </a>
+                            </li>
+
+                        </ul>
+
+                    </li> -->
+
+                </ul>
+
+            </div>
+
+        </div>
+    </nav>
+
+
+    <!-- =========================
+         HERO SECTION
+    ========================= -->
+
+    <section class="hero">
+
+        <h1>
+            Create Your
+            <span>Professional CV</span>
+        </h1>
+
+        <p>
+            Build a modern, professional resume in minutes.
+            Choose a template, add your information, and download your CV.
+        </p>
+
+        <a href="/create" class="btn">
+            Create My CV →
+        </a>
+
+    </section>
+
+
+    <!-- =========================
+         FEATURES SECTION
+    ========================= -->
+
+    <section class="features" id="features">
+
+        <!-- Card 1 -->
+        <div class="card">
+
+            <div class="card-icon">
+                🎨
+            </div>
+
+            <h3>
+                Modern Templates
+            </h3>
+
+            <p>
+                Choose from beautiful professional CV designs
+                that help your resume stand out.
+            </p>
+
+        </div>
+
+
+        <!-- Card 2 -->
+        <div class="card">
+
+            <div class="card-icon">
+                ⚡
+            </div>
+
+            <h3>
+                Easy to Use
+            </h3>
+
+            <p>
+                Fill in your details and create your professional
+                CV quickly and easily.
+            </p>
+
+        </div>
+
+
+        <!-- Card 3 -->
+        <div class="card">
+
+            <div class="card-icon">
+                📄
+            </div>
+
+            <h3>
+                PDF Download
+            </h3>
+
+            <p>
+                Download your completed CV in a professional
+                PDF format.
+            </p>
+
+        </div>
+
+    </section>
+
+
+    <!-- Bootstrap JavaScript -->
+    <script
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI"
+        crossorigin="anonymous">
+    </script>
+
+</body>
+</html>

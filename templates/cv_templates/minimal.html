@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ data.name }} - Modern CV</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            background: #eef2f7;
+            font-family: "Segoe UI", Arial, sans-serif;
+            color: #263238;
+        }
+
+        .cv-container {
+            width: 950px;
+            max-width: 95%;
+            margin: 35px auto;
+            background: #ffffff;
+            box-shadow: 0 12px 40px rgba(15, 35, 55, 0.12);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+       .header {
+    padding: 42px 50px;
+    background: linear-gradient(135deg, #ffffff 0%, #f2f7fc 100%);
+    border-bottom: 1px solid #e2eaf2;
+    position: relative;
+    text-align: center;
+}
+
+       .header::before {
+    content: "";
+    position: absolute;
+    left: 50%;
+    top: 0;
+    transform: translateX(-50%);
+    width: 90px;
+    height: 5px;
+    background: #2374ab;
+    border-radius: 0 0 8px 8px;
+}
+
+        .name {
+            font-size: 40px;
+            font-weight: 750;
+            color: #172b4d;
+            letter-spacing: -1px;
+            margin-bottom: 8px;
+        }
+
+       .job-title {
+    color: #2374ab;
+    font-size: 17px;
+    font-weight: 600;
+    margin-bottom: 22px;
+    text-align: center;
+}
+
+        .contact-row {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+        .contact-item {
+            background: #ffffff;
+            border: 1px solid #dce6ef;
+            color: #526273;
+            border-radius: 6px;
+            padding: 9px 13px;
+            font-size: 12px;
+        }
+
+       .content {
+    display: block;
+    padding: 42px 50px;
+}
+
+.main-content {
+    width: 100%;
+    min-width: 0;
+}
+
+.sidebar {
+    width: 100%;
+    border-left: none;
+    padding-left: 0;
+    margin-top: 10px;
+}
+
+        .section {
+            margin-bottom: 34px;
+        }
+
+        .section-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #172b4d;
+            font-size: 16px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.4px;
+            margin: 0 0 17px;
+        }
+
+        .section-title::before {
+            content: "";
+            width: 28px;
+            height: 4px;
+            background: #2374ab;
+            border-radius: 5px;
+        }
+
+        .section p {
+            margin: 0;
+            font-size: 14px;
+            line-height: 1.9;
+            color: #526273;
+            white-space: pre-line;
+        }
+
+        .skills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 9px;
+        }
+
+        .skill {
+            background: #edf5fb;
+            color: #23648e;
+            border: 1px solid #d7e8f5;
+            border-radius: 20px;
+            padding: 8px 13px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .sidebar .section {
+            margin-bottom: 30px;
+        }
+
+        .sidebar .section-title {
+            font-size: 14px;
+            letter-spacing: 1.2px;
+        }
+
+        .sidebar .section p {
+            font-size: 13px;
+            line-height: 1.8;
+        }
+
+        .download-area {
+            width: 950px;
+            max-width: 95%;
+            margin: 0 auto 35px;
+            text-align: center;
+        }
+
+        .download-button {
+            background: #2374ab;
+            color: white;
+            border: none;
+            padding: 14px 30px;
+            border-radius: 7px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(35, 116, 171, 0.22);
+            transition: 0.2s ease;
+        }
+
+        .download-button:hover {
+            background: #185c8b;
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 750px) {
+            .content {
+                grid-template-columns: 1fr;
+                gap: 20px;
+                padding: 32px 25px;
+            }
+
+            .sidebar {
+                border-left: none;
+                border-top: 1px solid #e3eaf1;
+                padding-left: 0;
+                padding-top: 28px;
+            }
+
+            .header {
+                padding: 35px 30px;
+            }
+
+            .name {
+                font-size: 32px;
+            }
+        }
+
+        @media print {
+            body {
+                background: white;
+            }
+
+            .cv-container {
+                width: 100%;
+                max-width: 100%;
+                margin: 0;
+                box-shadow: none;
+                border-radius: 0;
+            }
+
+            .download-area {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="cv-container">
+
+        <header class="header">
+            <div class="name">
+                {{ data.name }}
+            </div>
+
+            <div class="job-title">
+                {{ data.job_title }}
+            </div>
+
+            <div class="contact-row">
+                {% if data.email %}
+                <div class="contact-item">
+                    ✉ {{ data.email }}
+                </div>
+                {% endif %}
+
+                {% if data.phone %}
+                <div class="contact-item">
+                    ☎ {{ data.phone }}
+                </div>
+                {% endif %}
+            </div>
+        </header>
+
+        <div class="content">
+
+            <main class="main-content">
+
+                {% if data.summary %}
+                <section class="section">
+                    <h2 class="section-title">Profile</h2>
+                    <p>{{ data.summary }}</p>
+                </section>
+                {% endif %}
+
+                {% if data.experience %}
+                <section class="section">
+                    <h2 class="section-title">Experience</h2>
+                    <p>{{ data.experience }}</p>
+                </section>
+                {% endif %}
+
+                {% if data.education %}
+                <section class="section">
+                    <h2 class="section-title">Education</h2>
+                    <p>{{ data.education }}</p>
+                </section>
+                {% endif %}
+
+                {% if data.skills %}
+                <section class="section">
+                    <h2 class="section-title">Skills</h2>
+
+                    <div class="skills">
+                        {% for skill in data.skills.split(',') %}
+                            <span class="skill">{{ skill.strip() }}</span>
+                        {% endfor %}
+                    </div>
+                </section>
+                {% endif %}
+                
+                {% if data.references %}
+                <section class="section">
+                    <h2 class="section-title">References</h2>
+                    <p>{{ data.references }}</p>
+                </section>
+                {% endif %}
+
+            </main>
+
+          </div>
+
+    </div>
+
+    <div class="download-area">
+        <form action="/download" method="POST">
+            <input type="hidden" name="name" value="{{ data.name }}">
+            <input type="hidden" name="email" value="{{ data.email }}">
+            <input type="hidden" name="phone" value="{{ data.phone }}">
+            <input type="hidden" name="job_title" value="{{ data.job_title }}">
+            <input type="hidden" name="summary" value="{{ data.summary }}">
+            <input type="hidden" name="skills" value="{{ data.skills }}">
+            <input type="hidden" name="education" value="{{ data.education }}">
+            <input type="hidden" name="experience" value="{{ data.experience }}">
+            <input type="hidden" name="references" value="{{ data.references }}">
+            <input type="hidden" name="template" value="minimal">
+
+            <button class="download-button" type="submit">
+                Download CV
+            </button>
+        </form>
+    </div>
+
+</body>
+</html>
