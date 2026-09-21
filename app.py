@@ -240,6 +240,22 @@ def download_cv():
     else:
         html = f'<base href="{base_url}">' + html
 
+    # --------------------------------------------------
+    # FIX PROFILE PHOTO URL FOR PDF
+    # --------------------------------------------------
+
+    if data["photo"]:
+        photo_url = (
+            request.url_root.rstrip("/")
+            + "/static/uploads/"
+            + data["photo"]
+        )
+
+        html = html.replace(
+            f"/static/uploads/{data['photo']}",
+            photo_url
+        )
+
     browser = None
 
     # ==================================================
@@ -269,14 +285,12 @@ def download_cv():
                 device_scale_factor=1
             )
 
-            # networkidle REMOVE
             page.set_content(
                 html,
                 wait_until="domcontentloaded",
                 timeout=15000
             )
 
-            # Images/CSS ko thora time do
             page.wait_for_timeout(800)
 
             pdf_bytes = page.pdf(
