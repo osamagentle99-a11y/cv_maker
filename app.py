@@ -214,9 +214,7 @@ def download_cv():
     # --------------------------------------------------
 
     if data["photo"]:
-        data["photo"] = os.path.basename(
-            data["photo"]
-        )
+        data["photo"] = os.path.basename(data["photo"])
 
     # --------------------------------------------------
     # RENDER SAME HTML TEMPLATE
@@ -227,24 +225,22 @@ def download_cv():
         data=data
     )
 
-    # Browser ke static files, images aur CSS load karne
-    # ke liye base URL add kar rahe hain.
-    base_url = request.url_root
+    # --------------------------------------------------
+    # BASE URL FOR STATIC FILES
+    # --------------------------------------------------
+
+    base_url = request.url_root.rstrip("/") + "/"
 
     if "<head>" in html:
-
         html = html.replace(
             "<head>",
             f'<head><base href="{base_url}">',
             1
         )
-
     else:
+        html = f'<base href="{base_url}">' + html
 
-        html = (
-            f'<base href="{base_url}">'
-            + html
-        )
+    browser = None
 
     # ==================================================
     # CONVERT HTML TO PDF USING CHROMIUM
@@ -255,7 +251,14 @@ def download_cv():
         with sync_playwright() as playwright:
 
             browser = playwright.chromium.launch(
-                headless=True
+                headless=True,
+                args=[
+                    "--no-sandbox",
+                    "--disable-setuid-sandbox",
+                    "--disable-dev-shm-usage",
+                    "--disable-gpu",
+                    "--disable-software-rasterizer"
+                ]
             )
 
             page = browser.new_page(
@@ -266,17 +269,20 @@ def download_cv():
                 device_scale_factor=1
             )
 
+            # networkidle REMOVE
             page.set_content(
                 html,
-                wait_until="networkidle"
+                wait_until="domcontentloaded",
+                timeout=15000
             )
 
-            # Browser preview jaisa hi PDF generate hoga
+            # Images/CSS ko thora time do
+            page.wait_for_timeout(800)
+
             pdf_bytes = page.pdf(
                 format="A4",
                 print_background=True,
                 prefer_css_page_size=True,
-
                 margin={
                     "top": "0",
                     "right": "0",
@@ -286,19 +292,25 @@ def download_cv():
             )
 
             browser.close()
+            browser = None
 
     except Exception as error:
 
-        print("PDF generation error:", error)
+        print("PDF generation error:", repr(error))
+
+        if browser:
+            try:
+                browser.close()
+            except Exception:
+                pass
 
         return (
-            "PDF generate nahi ho saka. "
-            "Terminal mein 'playwright install chromium' run karein.",
+            "PDF generate nahi ho saka. Please dobara try karein.",
             500
         )
 
     # ==================================================
-    # SEND PDF TO USER
+    # SEND PDF
     # ==================================================
 
     return send_file(
@@ -307,8 +319,6 @@ def download_cv():
         download_name="professional_cv.pdf",
         mimetype="application/pdf"
     )
-
-
 # ==================================================
 # RUN APP
 # ==================================================
