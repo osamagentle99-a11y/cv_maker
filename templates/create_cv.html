@@ -4,6 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create Your CV | CVCraft</title>
+    <link
+    rel="icon"
+    type="image/png"
+    href="{{ url_for('static', filename='finallogo.png') }}"
+>
      <link
         href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css"
         rel="stylesheet"
@@ -764,6 +769,12 @@
                         placeholder="John Smith - Senior Manager, ABC Company&#10;Email: john@example.com&#10;Phone: +92 300 1234567"
                     ></textarea>
                 </div>
+                <button type="submit"
+                    name="action"
+                    value="ats"
+                    class="btn">
+                        Check My ATS Score →
+                </button>
 
                 <button type="submit" class="btn">
                     Generate My CV →

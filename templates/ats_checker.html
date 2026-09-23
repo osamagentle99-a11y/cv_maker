@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>ATS Resume Checker | DESIGNATION.CV</title>
+    <link
+    rel="icon"
+    type="image/png"
+    href="{{ url_for('static', filename='finallogo.png') }}"
+>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: #f4f7fb;
+            color: #123b63;
+        }
+
+        .ats-container {
+            max-width: 900px;
+            margin: 60px auto;
+            padding: 20px;
+        }
+
+        .ats-card {
+            background: white;
+            padding: 35px;
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+        }
+
+        .ats-title {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+
+        .ats-subtitle {
+            text-align: center;
+            color: #667085;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 22px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 220px;
+            padding: 14px;
+            border: 1px solid #d5dce5;
+            border-radius: 10px;
+            resize: vertical;
+            font-size: 15px;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #123b63;
+        }
+
+        .check-btn {
+            width: 100%;
+            border: none;
+            padding: 14px;
+            border-radius: 10px;
+            background: #123b63;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .check-btn:hover {
+            background: #0d2e4d;
+        }
+        .ats-result {
+    margin-top: 35px;
+    padding-top: 30px;
+    border-top: 1px solid #e5e7eb;
+}
+
+.ats-result h2 {
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.score {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 30px;
+    border-radius: 50%;
+    background: #123b63;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.keyword-section {
+    margin-top: 25px;
+}
+
+.keyword-section h3 {
+    margin-bottom: 12px;
+}
+
+.keyword-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.keyword {
+    display: inline-block;
+    padding: 7px 12px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.keyword.matched {
+    background: #e8f7ee;
+    color: #18794e;
+}
+
+.keyword.missing {
+    background: #fff0f0;
+    color: #c62828;
+}
+.validation-section {
+    margin-top: 30px;
+}
+
+.validation-section h3 {
+    margin-bottom: 15px;
+}
+
+.validation-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 16px;
+    margin-bottom: 10px;
+    border: 1px solid #e5e7eb;
+    border-radius: 10px;
+    background: #fafafa;
+}
+
+.validation-valid {
+    color: #18794e;
+    font-weight: 600;
+}
+
+.validation-invalid {
+    color: #c62828;
+    font-weight: 600;
+}
+    
+</style>
+</head>
+
+<body>
+
+    <div class="ats-container">
+
+        <div class="ats-card">
+
+            <h1 class="ats-title">ATS Resume Checker</h1>
+
+            <p class="ats-subtitle">
+                Check your resume for ATS-friendly content and keywords.
+            </p>
+
+            <form method="POST">
+
+                <div class="form-group">
+                    <label for="resume_text">
+                        Paste Your Resume
+                    </label>
+
+                    <textarea
+                    id="resume_text"
+                    name="resume_text"
+                    placeholder="Paste your resume text here..."
+                    required>
+                        {{ resume_text or "" }}
+                    </textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="job_description">
+                        Job Description
+                    </label>
+
+                   <textarea
+                    id="job_description"
+                    name="job_description"
+                    placeholder="Paste the job description here..."
+                    required
+                    >{{ job_description or "" }}</textarea>
+                </div>
+
+                <button
+                    type="submit"
+                    name="action"
+                    value="ats"
+                    class="check-btn">
+                     Check ATS Score</a>  
+                </button>
+            </form>
+
+        </div>
+        {% if score is defined %}
+
+<div class="ats-result">
+
+    <h2 id="score">ATS Score</h2>
+    <div class="validation-section">
+
+    <h3>Contact Validation</h3>
+
+    <div class="validation-item">
+        <span>Email</span>
+
+        {% if email_status == "valid" %}
+            <span class="validation-valid">✓ Valid Email</span>
+        {% else %}
+            <span class="validation-invalid">⚠ Email Missing</span>
+        {% endif %}
+    </div>
+
+    <div class="validation-item">
+        <span>LinkedIn</span>
+
+        {% if linkedin_status == "valid" %}
+            <span class="validation-valid">✓ Valid LinkedIn URL</span>
+        {% else %}
+            <span class="validation-invalid">⚠ LinkedIn URL Missing</span>
+        {% endif %}
+    </div>
+
+</div>
+
+    <div class="score">
+        {{ score }}/100
+    </div>
+
+    <div class="keyword-section">
+        <h3>Matched Keywords</h3>
+
+        {% if matched_keywords %}
+            <div class="keyword-list">
+                {% for keyword in matched_keywords %}
+                    <span class="keyword matched">
+                        {{ keyword }}
+                    </span>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>No matching keywords found.</p>
+        {% endif %}
+    </div>
+
+    <div class="keyword-section">
+        <h3>Missing Keywords</h3>
+
+        {% if missing_keywords %}
+            <div class="keyword-list">
+                {% for keyword in missing_keywords %}
+                    <span class="keyword missing">
+                        {{ keyword }}
+                    </span>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p>No major missing keywords detected.</p>
+        {% endif %}
+    </div>
+
+</div>
+
+{% endif %}
+
+    </div>
+
+    <script>
+    const atsForm = document.querySelector("form");
+
+    atsForm.addEventListener("submit", function () {
+        sessionStorage.setItem("scrollToATSScore", "true");
+    });
+
+    window.addEventListener("load", function () {
+
+        if (sessionStorage.getItem("scrollToATSScore") === "true") {
+
+            const scoreSection = document.getElementById("score");
+
+            if (scoreSection) {
+
+                setTimeout(function () {
+
+                    scoreSection.scrollIntoView({
+                        behavior: "smooth",
+                        block: "start"
+                    });
+
+                    sessionStorage.removeItem("scrollToATSScore");
+
+                }, 300);
+            }
+        }
+    });
+</script>
+
+</body>
+</html>

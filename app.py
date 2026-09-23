@@ -1,5 +1,6 @@
 import os
 import uuid
+import re
 from io import BytesIO
 
 from flask import (
@@ -10,7 +11,6 @@ from flask import (
 )
 
 from werkzeug.utils import secure_filename
-
 from playwright.sync_api import sync_playwright
 
 
@@ -80,6 +80,7 @@ def get_template_name(template_value):
             ALLOWED_TEMPLATES[template_value]
         )
 
+    # Invalid value ke liye default template
     return (
         "modern_blue",
         ALLOWED_TEMPLATES["modern_blue"]
@@ -120,6 +121,241 @@ def get_cv_data():
 
 
 # ==================================================
+# BUILD RESUME TEXT FOR ATS
+# ==================================================
+
+def build_resume_text(data):
+    """
+    CV data ko ATS checker ke liye plain text resume mein convert karta hai.
+    """
+
+    return f"""
+Name: {data.get('name', '')}
+Job Title: {data.get('job_title', '')}
+Email: {data.get('email', '')}
+Phone: {data.get('phone', '')}
+LinkedIn: {data.get('linkedin', '')}
+
+Professional Summary:
+{data.get('summary', '')}
+
+Skills:
+{data.get('skills', '')}
+
+Languages:
+{data.get('languages', '')}
+
+Education:
+{data.get('education', '')}
+
+Experience:
+{data.get('experience', '')}
+
+References:
+{data.get('references', '')}
+""".strip()
+
+
+# ==================================================
+# ATS CHECKING HELPER
+# ==================================================
+
+def calculate_ats_result(resume_text, job_description):
+    """
+    Resume aur Job Description ko compare karke ATS result calculate karta hai.
+    """
+
+    resume_text = (resume_text or "").strip()
+    job_description = (job_description or "").strip()
+
+    # --------------------------------------------------
+    # STOP WORDS
+    # --------------------------------------------------
+
+    stop_words = {
+        "the",
+        "and",
+        "for",
+        "with",
+        "that",
+        "this",
+        "from",
+        "your",
+        "you",
+        "are",
+        "our",
+        "will",
+        "have",
+        "has",
+        "been",
+        "was",
+        "were",
+        "they",
+        "their",
+        "about",
+        "into",
+        "using",
+        "use",
+        "work",
+        "working",
+        "job",
+        "role",
+        "candidate",
+        "years",
+        "year",
+        "required",
+        "preferred",
+        "responsibilities",
+        "requirements",
+        "skills",
+        "ability",
+        "strong",
+        "good",
+        "excellent",
+        "knowledge",
+        "experience",
+        "must",
+        "should",
+        "can",
+        "our",
+        "you'll",
+        "we",
+        "be",
+        "to",
+        "of",
+        "in",
+        "on",
+        "a",
+        "an",
+        "is",
+        "as",
+        "or",
+        "at",
+        "by"
+    }
+
+    # --------------------------------------------------
+    # EXTRACT JOB KEYWORDS
+    # --------------------------------------------------
+
+    job_words = re.findall(
+        r"\b[a-zA-Z][a-zA-Z0-9+#.-]*\b",
+        job_description.lower()
+    )
+
+    job_keywords = []
+
+    for word in job_words:
+        if (
+            len(word) >= 3
+            and word not in stop_words
+            and word not in job_keywords
+        ):
+            job_keywords.append(word)
+
+    # --------------------------------------------------
+    # RESUME TEXT
+    # --------------------------------------------------
+
+    resume_lower = resume_text.lower()
+
+    # --------------------------------------------------
+    # MATCHED / MISSING KEYWORDS
+    # --------------------------------------------------
+
+    matched_keywords = []
+    missing_keywords = []
+
+    for keyword in job_keywords:
+
+        # Word/phrase presence check
+        if keyword in resume_lower:
+            matched_keywords.append(keyword)
+        else:
+            missing_keywords.append(keyword)
+
+    # --------------------------------------------------
+    # EMAIL VALIDATION
+    # --------------------------------------------------
+
+    email_pattern = (
+        r"\b[A-Za-z0-9._%+-]+"
+        r"@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b"
+    )
+
+    emails = re.findall(
+        email_pattern,
+        resume_text
+    )
+
+    email_status = "valid" if emails else "missing"
+
+    # --------------------------------------------------
+    # LINKEDIN VALIDATION
+    # --------------------------------------------------
+
+    linkedin_pattern = (
+        r"(?:https?://)?"
+        r"(?:www\.)?"
+        r"linkedin\.com/in/"
+        r"[A-Za-z0-9_-]+"
+        r"/?"
+    )
+
+    linkedin_matches = re.findall(
+        linkedin_pattern,
+        resume_text,
+        re.IGNORECASE
+    )
+
+    linkedin_status = (
+        "valid" if linkedin_matches else "missing"
+    )
+
+    # --------------------------------------------------
+    # ATS SCORE
+    # --------------------------------------------------
+    #
+    # 80 points = Job-description keyword matching
+    # 10 points = Email
+    # 10 points = LinkedIn
+    #
+
+    if job_keywords:
+        keyword_score = (
+            len(matched_keywords)
+            / len(job_keywords)
+        ) * 80
+    else:
+        keyword_score = 0
+
+    contact_score = 0
+
+    if email_status == "valid":
+        contact_score += 10
+
+    if linkedin_status == "valid":
+        contact_score += 10
+
+    score = round(
+        keyword_score + contact_score
+    )
+
+    # Safety: score always remains 0-100
+    score = max(0, min(score, 100))
+
+    return {
+        "score": score,
+        "matched_keywords": matched_keywords,
+        "missing_keywords": missing_keywords,
+        "emails": emails,
+        "email_status": email_status,
+        "linkedin_matches": linkedin_matches,
+        "linkedin_status": linkedin_status
+    }
+
+
+# ==================================================
 # HOME PAGE
 # ==================================================
 
@@ -129,11 +365,57 @@ def home():
 
 
 # ==================================================
+# ATS CHECKER
+# ==================================================
+
+@app.route("/ats-checker", methods=["GET", "POST"])
+def ats_checker():
+
+    if request.method == "POST":
+
+        resume_text = request.form.get(
+            "resume_text",
+            ""
+        ).strip()
+
+        job_description = request.form.get(
+            "job_description",
+            ""
+        ).strip()
+
+        result = calculate_ats_result(
+            resume_text,
+            job_description
+        )
+
+        return render_template(
+            "ats_checker.html",
+            resume_text=resume_text,
+            job_description=job_description,
+            score=result["score"],
+            matched_keywords=result["matched_keywords"],
+            missing_keywords=result["missing_keywords"],
+            emails=result["emails"],
+            email_status=result["email_status"],
+            linkedin_matches=result["linkedin_matches"],
+            linkedin_status=result["linkedin_status"]
+        )
+
+    return render_template(
+        "ats_checker.html"
+    )
+
+
+# ==================================================
 # CREATE CV / PREVIEW
 # ==================================================
 
 @app.route("/create", methods=["GET", "POST"])
 def create_cv():
+
+    # --------------------------------------------------
+    # OPEN CREATE PAGE
+    # --------------------------------------------------
 
     if request.method == "GET":
         return render_template("create_cv.html")
@@ -143,8 +425,49 @@ def create_cv():
     # --------------------------------------------------
 
     data = get_cv_data()
-
     selected_template = data["template"]
+
+    # --------------------------------------------------
+    # ATS CHECKER FROM CREATE PAGE
+    # --------------------------------------------------
+
+    if request.form.get("action") == "ats":
+
+        # If ATS form already contains resume text,
+        # use that text.
+        resume_text = request.form.get(
+            "resume_text",
+            ""
+        ).strip()
+
+        # If no resume text was submitted, build it
+        # automatically from the CV fields.
+        if not resume_text:
+            resume_text = build_resume_text(data)
+
+        job_description = request.form.get(
+            "job_description",
+            ""
+        ).strip()
+
+        result = calculate_ats_result(
+            resume_text,
+            job_description
+        )
+
+        return render_template(
+            "ats_checker.html",
+            resume_text=resume_text,
+            job_description=job_description,
+            score=result["score"],
+            matched_keywords=result["matched_keywords"],
+            missing_keywords=result["missing_keywords"],
+            emails=result["emails"],
+            email_status=result["email_status"],
+            linkedin_matches=result["linkedin_matches"],
+            linkedin_status=result["linkedin_status"],
+            cv_data=data
+        )
 
     # ==================================================
     # PROFILE PHOTO UPLOAD
@@ -183,7 +506,11 @@ def create_cv():
                 data["photo"] = unique_filename
 
             except Exception as error:
-                print("Photo save error:", error)
+                print(
+                    "Photo save error:",
+                    error
+                )
+
                 data["photo"] = ""
 
     # ==================================================
@@ -214,7 +541,9 @@ def download_cv():
     # --------------------------------------------------
 
     if data["photo"]:
-        data["photo"] = os.path.basename(data["photo"])
+        data["photo"] = os.path.basename(
+            data["photo"]
+        )
 
     # --------------------------------------------------
     # RENDER SAME HTML TEMPLATE
@@ -229,22 +558,32 @@ def download_cv():
     # BASE URL FOR STATIC FILES
     # --------------------------------------------------
 
-    base_url = request.url_root.rstrip("/") + "/"
+    base_url = (
+        request.url_root.rstrip("/")
+        + "/"
+    )
 
     if "<head>" in html:
+
         html = html.replace(
             "<head>",
             f'<head><base href="{base_url}">',
             1
         )
+
     else:
-        html = f'<base href="{base_url}">' + html
+
+        html = (
+            f'<base href="{base_url}">'
+            + html
+        )
 
     # --------------------------------------------------
     # FIX PROFILE PHOTO URL FOR PDF
     # --------------------------------------------------
 
     if data["photo"]:
+
         photo_url = (
             request.url_root.rstrip("/")
             + "/static/uploads/"
@@ -310,16 +649,21 @@ def download_cv():
 
     except Exception as error:
 
-        print("PDF generation error:", repr(error))
+        print(
+            "PDF generation error:",
+            repr(error)
+        )
 
         if browser:
+
             try:
                 browser.close()
             except Exception:
                 pass
 
         return (
-            "PDF generate nahi ho saka. Please dobara try karein.",
+            "PDF generate nahi ho saka. "
+            "Please dobara try karein.",
             500
         )
 
@@ -333,6 +677,8 @@ def download_cv():
         download_name="professional_cv.pdf",
         mimetype="application/pdf"
     )
+
+
 # ==================================================
 # RUN APP
 # ==================================================
