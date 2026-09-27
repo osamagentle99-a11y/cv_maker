@@ -433,6 +433,17 @@ def sitemap():
         mimetype="application/xml"
     )
 
+@app.route("/robots.txt")
+def robots_txt():
+    return Response(
+        """User-agent: *
+Allow: /
+
+Sitemap: https://cv-maker-tybx.onrender.com/sitemap.xml
+""",
+        mimetype="text/plain"
+    )
+
 @app.route("/create", methods=["GET", "POST"])
 def create_cv():
 
