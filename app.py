@@ -8,7 +8,8 @@ from flask import (
     render_template,
     request,
     send_file,
-    Response
+    Response,
+    send_from_directory
 )
 
 from werkzeug.utils import secure_filename
@@ -16,6 +17,12 @@ from playwright.sync_api import sync_playwright
 
 
 app = Flask(__name__)
+@app.route("/googlee3439df4f5d23a5a.html")
+def google_verification():
+    return send_from_directory(
+        app.root_path,
+        "googlee3439df4f5d23a5a.html"
+    )
 
 
 # ==================================================
