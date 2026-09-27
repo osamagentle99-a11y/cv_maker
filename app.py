@@ -7,7 +7,8 @@ from flask import (
     Flask,
     render_template,
     request,
-    send_file
+    send_file,
+    Response
 )
 
 from werkzeug.utils import secure_filename
@@ -409,6 +410,28 @@ def ats_checker():
 # ==================================================
 # CREATE CV / PREVIEW
 # ==================================================
+@app.route("/sitemap.xml")
+def sitemap():
+    return Response(
+        """<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+
+    <url>
+        <loc>https://cv-maker-tybx.onrender.com/</loc>
+    </url>
+
+    <url>
+        <loc>https://cv-maker-tybx.onrender.com/create</loc>
+    </url>
+
+    <url>
+        <loc>https://cv-maker-tybx.onrender.com/ats-checker</loc>
+    </url>
+
+</urlset>
+""",
+        mimetype="application/xml"
+    )
 
 @app.route("/create", methods=["GET", "POST"])
 def create_cv():
